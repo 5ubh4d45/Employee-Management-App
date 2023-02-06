@@ -15,7 +15,7 @@ function CreateEmployeeComponent() {
       const {name, value} = e.target;
       setInputField(prevState => ({
           ...prevState, [name]: value,
-      }))                      // I have no idea wtf it means got from: https://stackoverflow.com/questions/53519578/forms-as-functional-components-with-react
+      }))                   // I have no idea wtf it means got from: https://stackoverflow.com/questions/53519578/forms-as-functional-components-with-react
     }
 
     return (
