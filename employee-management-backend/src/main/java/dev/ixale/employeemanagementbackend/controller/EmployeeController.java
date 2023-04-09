@@ -1,7 +1,7 @@
 package dev.ixale.employeemanagementbackend.controller;
 
 import dev.ixale.employeemanagementbackend.model.Employee;
-import dev.ixale.employeemanagementbackend.repository.EmployeeRepository;
+import dev.ixale.employeemanagementbackend.service.EmployeeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,60 +12,74 @@ import java.util.Optional;
 @RequestMapping("/api/v1/employees")
 public class EmployeeController {
 
-    private final EmployeeRepository employeeRepository;
+    private final EmployeeService employeeService;
 
-    public EmployeeController(EmployeeRepository employeeRepository) {
-        this.employeeRepository = employeeRepository;
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
     }
 
-    // gets all employees data
+    // GET
     @GetMapping("/")
     public ResponseEntity<Object> getAllEmployees() {
 
-        return ResponseEntity.ok(employeeRepository.findAll());
+        return ResponseEntity.ok(employeeService.getAllEmployees());
     }
     @GetMapping("/{id}")
     public ResponseEntity<Object> getEmployee(@PathVariable("id") Long id) {
-        Optional<Employee> employeeOptional = employeeRepository.findById(id);
+        Optional<Employee> employeeOptional = employeeService.getEmployeeById(id);
 
+        return processEmptyOptional(employeeOptional);
+    }
+
+    // Search
+    @GetMapping("/search/firstName")
+    public ResponseEntity<Object> searchEmployeeByFirstName(@RequestParam("firstName") String firstName) {
+        Optional<Employee> employeeOptional = employeeService.getEmployeeByFirstName(firstName);
+
+        return processEmptyOptional(employeeOptional);
+    }
+    @GetMapping("/search/lastName")
+    public ResponseEntity<Object> searchEmployeeByLastName(@RequestParam("lastName") String lastName) {
+        Optional<Employee> employeeOptional = employeeService.getEmployeeByLastName(lastName);
+
+        return processEmptyOptional(employeeOptional);
+    }
+    @GetMapping("/search/emailId")
+    public ResponseEntity<Object> searchEmployeeByEmailId(@RequestParam("emailId") String emailId) {
+        Optional<Employee> employeeOptional = employeeService.getEmployeeByEmailId(emailId);
+
+        return processEmptyOptional(employeeOptional);
+    }
+
+
+    // POST
+    @PostMapping("/")
+    public ResponseEntity<Object> postEmployee(@RequestBody Employee employee) {
+        return ResponseEntity.ok(employeeService.saveNewEmployee(employee));
+    }
+
+
+    // PUT
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> putEmployee(@PathVariable("id") Long id, @RequestBody Employee employee) {
+        Optional<Employee> employeeOptional = employeeService.updateEmployee(id, employee);
+
+        return processEmptyOptional(employeeOptional);
+    }
+
+
+    // DELETE
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteEmployee(@PathVariable("id") Long id) {
+        Optional<Employee> employeeOptional = employeeService.deleteEmployee(id);
+
+        return processEmptyOptional(employeeOptional);
+    }
+
+    private ResponseEntity<Object> processEmptyOptional(Optional<Employee> employeeOptional) {
         if (employeeOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(employeeOptional.get());
-    }
-
-    // rest api
-    @PostMapping("/")
-    public ResponseEntity<Object> createEmployee(@RequestBody Employee employee) {
-        return ResponseEntity.ok(employeeRepository.save(employee));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Object> updateEmployee(@PathVariable("id") Long id, @RequestBody Employee employee) {
-        Optional<Employee> employeeOptional = employeeRepository.findById(id);
-
-        if (employeeOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        Employee existingEmployee = employeeOptional.get();
-        existingEmployee.setFirstName(employee.getFirstName());
-        existingEmployee.setLastName(employee.getLastName());
-        existingEmployee.setEmailId(employee.getEmailId());
-
-        employeeRepository.save(existingEmployee);
-
-        return ResponseEntity.ok(existingEmployee);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteEmployee(@PathVariable("id") Long id) {
-        Optional<Employee> employeeOptional = employeeRepository.findById(id);
-
-        if (employeeOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        employeeRepository.deleteById(id);
-        return ResponseEntity.ok().build();
     }
 }
