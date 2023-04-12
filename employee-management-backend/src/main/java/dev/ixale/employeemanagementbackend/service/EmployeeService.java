@@ -9,9 +9,13 @@ import java.util.Optional;
 public interface EmployeeService {
     List<Employee> getAllEmployees();
     Optional<Employee> getEmployeeById(long id);
-    Optional<Employee> getEmployeeByFirstName(String firstName);
-    Optional<Employee> getEmployeeByLastName(String lastName);
-    Optional<Employee> getEmployeeByEmailId(String emailId);
+
+
+    Optional<List<Employee>>  getEmployeeByFirstName(String firstName);
+    Optional<List<Employee>>  getEmployeeByLastName(String lastName);
+    Optional<List<Employee>>  getEmployeeByEmailId(String emailId);
+
+    List<Employee> searchEmployees(String firstName, String lastName, String emailId);
 
     Optional<Employee> saveNewEmployee(Employee employee);
 

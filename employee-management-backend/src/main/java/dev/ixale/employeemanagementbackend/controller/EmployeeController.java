@@ -5,6 +5,7 @@ import dev.ixale.employeemanagementbackend.service.EmployeeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @CrossOrigin(origins ="http://localhost:3000/")
@@ -28,29 +29,40 @@ public class EmployeeController {
     public ResponseEntity<Object> getEmployee(@PathVariable("id") Long id) {
         Optional<Employee> employeeOptional = employeeService.getEmployeeById(id);
 
-        return processEmptyOptional(employeeOptional);
+        return processEmptyOptionalEmployee(employeeOptional);
     }
 
     // Search
     @GetMapping("/search/firstName")
     public ResponseEntity<Object> searchEmployeeByFirstName(@RequestParam("firstName") String firstName) {
-        Optional<Employee> employeeOptional = employeeService.getEmployeeByFirstName(firstName);
+        Optional<List<Employee>> employeeOptional = employeeService.getEmployeeByFirstName(firstName);
 
-        return processEmptyOptional(employeeOptional);
+        return processEmptyOptionalEmployeeList(employeeOptional);
     }
     @GetMapping("/search/lastName")
     public ResponseEntity<Object> searchEmployeeByLastName(@RequestParam("lastName") String lastName) {
-        Optional<Employee> employeeOptional = employeeService.getEmployeeByLastName(lastName);
+        Optional<List<Employee>> employeeOptional = employeeService.getEmployeeByLastName(lastName);
 
-        return processEmptyOptional(employeeOptional);
+        return processEmptyOptionalEmployeeList(employeeOptional);
     }
     @GetMapping("/search/emailId")
     public ResponseEntity<Object> searchEmployeeByEmailId(@RequestParam("emailId") String emailId) {
-        Optional<Employee> employeeOptional = employeeService.getEmployeeByEmailId(emailId);
+        Optional<List<Employee>> employeeOptional = employeeService.getEmployeeByEmailId(emailId);
 
-        return processEmptyOptional(employeeOptional);
+        return processEmptyOptionalEmployeeList(employeeOptional);
     }
+    @GetMapping("/search")
+    public ResponseEntity<Object> searchEmployees(
+            @RequestParam(value = "firstName", required = false) String firstName,
+            @RequestParam(value = "lastName", required = false) String lastName,
+            @RequestParam(value = "emailId", required = false) String emailID ) {
 
+        List<Employee> searchedEmployees = employeeService.searchEmployees(firstName, lastName, emailID);
+
+        if (searchedEmployees.isEmpty()) return ResponseEntity.noContent().build();
+
+        return ResponseEntity.ok(searchedEmployees);
+    }
 
     // POST
     @PostMapping("/")
@@ -64,7 +76,7 @@ public class EmployeeController {
     public ResponseEntity<Object> putEmployee(@PathVariable("id") Long id, @RequestBody Employee employee) {
         Optional<Employee> employeeOptional = employeeService.updateEmployee(id, employee);
 
-        return processEmptyOptional(employeeOptional);
+        return processEmptyOptionalEmployee(employeeOptional);
     }
 
 
@@ -73,13 +85,20 @@ public class EmployeeController {
     public ResponseEntity<Object> deleteEmployee(@PathVariable("id") Long id) {
         Optional<Employee> employeeOptional = employeeService.deleteEmployee(id);
 
-        return processEmptyOptional(employeeOptional);
+        return processEmptyOptionalEmployee(employeeOptional);
     }
 
-    private ResponseEntity<Object> processEmptyOptional(Optional<Employee> employeeOptional) {
+    private ResponseEntity<Object> processEmptyOptionalEmployee(Optional<Employee> employeeOptional) {
         if (employeeOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(employeeOptional.get());
     }
+    private ResponseEntity<Object> processEmptyOptionalEmployeeList(Optional<List<Employee>> employeeOptional) {
+        if (employeeOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(employeeOptional.get());
+    }
+
 }
