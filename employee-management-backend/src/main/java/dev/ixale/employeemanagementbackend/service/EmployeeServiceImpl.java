@@ -9,6 +9,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,11 +27,20 @@ public class EmployeeServiceImpl implements EmployeeService{
         this.employeeRepository = employeeRepository;
     }
 
-
     // Get
+
     @Override
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
+    }
+
+    @Override
+    public List<Employee> getAllEmployees(int numberOfEmployees) {
+        if (numberOfEmployees == 0) {
+            return employeeRepository.findAll();
+        }
+        PageRequest pageRequest = PageRequest.of(0, numberOfEmployees);
+        return employeeRepository.findAll(pageRequest).getContent();
     }
 
     @Override
@@ -54,6 +64,7 @@ public class EmployeeServiceImpl implements EmployeeService{
     }
 
     // Search
+
     @Override
     public List<Employee> searchEmployees(String firstName, String lastName, String emailId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -81,8 +92,14 @@ public class EmployeeServiceImpl implements EmployeeService{
 
 
     // Save & Update
+
     @Override
     public Optional<Employee> saveNewEmployee(Employee employee) {
+        // create a search query to check if the employee already exists
+        List<Employee> employees = searchEmployees(employee.getFirstName(), employee.getLastName(), employee.getEmailId());
+        if (employees.size() > 0)
+            return Optional.empty();
+
         return Optional.of(employeeRepository.save(employee));
     }
 
@@ -103,6 +120,7 @@ public class EmployeeServiceImpl implements EmployeeService{
     }
 
     // Delete
+
     @Override
     public Optional<Employee> deleteEmployee(long id) {
         Optional<Employee> employeeOptional = employeeRepository.findById(id);

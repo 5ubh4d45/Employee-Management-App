@@ -29,7 +29,7 @@ public class EmployeeController {
     public ResponseEntity<Object> getEmployee(@PathVariable("id") Long id) {
         Optional<Employee> employeeOptional = employeeService.getEmployeeById(id);
 
-        return processEmptyOptionalEmployee(employeeOptional);
+        return processEmptyOptionalEmployee(employeeOptional, "Employee with id " + id + " not found");
     }
 
     // Search
@@ -37,19 +37,19 @@ public class EmployeeController {
     public ResponseEntity<Object> searchEmployeeByFirstName(@RequestParam("firstName") String firstName) {
         Optional<List<Employee>> employeeOptional = employeeService.getEmployeeByFirstName(firstName);
 
-        return processEmptyOptionalEmployeeList(employeeOptional);
+        return processEmptyOptionalEmployeeList(employeeOptional, "Employee with firstName " + firstName + " not found");
     }
     @GetMapping("/search/lastName")
     public ResponseEntity<Object> searchEmployeeByLastName(@RequestParam("lastName") String lastName) {
         Optional<List<Employee>> employeeOptional = employeeService.getEmployeeByLastName(lastName);
 
-        return processEmptyOptionalEmployeeList(employeeOptional);
+        return processEmptyOptionalEmployeeList(employeeOptional, "Employee with lastName " + lastName + " not found");
     }
     @GetMapping("/search/emailId")
     public ResponseEntity<Object> searchEmployeeByEmailId(@RequestParam("emailId") String emailId) {
         Optional<List<Employee>> employeeOptional = employeeService.getEmployeeByEmailId(emailId);
 
-        return processEmptyOptionalEmployeeList(employeeOptional);
+        return processEmptyOptionalEmployeeList(employeeOptional, "Employee with emailId " + emailId + " not found");
     }
     @GetMapping("/search")
     public ResponseEntity<Object> searchEmployees(
@@ -67,7 +67,11 @@ public class EmployeeController {
     // POST
     @PostMapping("/")
     public ResponseEntity<Object> postEmployee(@RequestBody Employee employee) {
-        return ResponseEntity.ok(employeeService.saveNewEmployee(employee));
+        Optional<Employee> employeeOptional = employeeService.saveNewEmployee(employee);
+
+        return processEmptyOptionalEmployee(employeeOptional, "Employee with "
+                + "firstName " + employee.getFirstName() + ", lastName " + employee.getLastName() + ", emailId " + employee.getEmailId()
+                + " already exists");
     }
 
 
@@ -76,7 +80,7 @@ public class EmployeeController {
     public ResponseEntity<Object> putEmployee(@PathVariable("id") Long id, @RequestBody Employee employee) {
         Optional<Employee> employeeOptional = employeeService.updateEmployee(id, employee);
 
-        return processEmptyOptionalEmployee(employeeOptional);
+        return processEmptyOptionalEmployee(employeeOptional, "Employee with id " + id + " not found");
     }
 
 
@@ -85,18 +89,20 @@ public class EmployeeController {
     public ResponseEntity<Object> deleteEmployee(@PathVariable("id") Long id) {
         Optional<Employee> employeeOptional = employeeService.deleteEmployee(id);
 
-        return processEmptyOptionalEmployee(employeeOptional);
+        return processEmptyOptionalEmployee(employeeOptional, "Employee with id " + id + " not found");
     }
 
-    private ResponseEntity<Object> processEmptyOptionalEmployee(Optional<Employee> employeeOptional) {
+    private ResponseEntity<Object> processEmptyOptionalEmployee(Optional<Employee> employeeOptional, String message) {
         if (employeeOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body(message);
         }
         return ResponseEntity.ok(employeeOptional.get());
     }
-    private ResponseEntity<Object> processEmptyOptionalEmployeeList(Optional<List<Employee>> employeeOptional) {
+    private ResponseEntity<Object> processEmptyOptionalEmployeeList(Optional<List<Employee>> employeeOptional, String message){
         if (employeeOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body(message);
+        } else if (employeeOptional.get().isEmpty()) {
+            return ResponseEntity.status(404).body(message);
         }
         return ResponseEntity.ok(employeeOptional.get());
     }
