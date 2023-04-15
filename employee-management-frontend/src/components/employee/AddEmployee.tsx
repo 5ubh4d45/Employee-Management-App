@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
-import { Employee } from '../../data/Employee'
+import { EmployeeData } from '../../data/EmployeeData'
 import EmployeeService from '../../services/EmployeeService';
+import { useNavigate } from 'react-router-dom';
 
 const AddEmployee = () => {
-  const [employee, setEmployee] = useState<Employee>({
-    id: null,
+  const [employee, setEmployee] = useState<EmployeeData>({
+    id: '',
     firstName: '',
     lastName: '',
     emailId: ''
   });
+  const navigaveTo = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -32,14 +34,25 @@ const AddEmployee = () => {
         alert("Cannot save employee. Something went wrong. Please try again later.");
       }      
       alert("Employee saved successfully.");
-
+      
     })
     .catch((error) => {
       console.log(error);
-      alert(error);
+      alert("Cannot save employee. " + error);
     });
 
+    navigaveTo('/employeeList');
   };
+
+  function clear(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    e.preventDefault();
+    setEmployee({
+      id: '',
+      firstName: '',
+      lastName: '',
+      emailId: ''
+    });
+  }
 
   return (
     <div className="flex max-w-2xl mx-auto shadow border-b">
@@ -74,7 +87,7 @@ const AddEmployee = () => {
           <input type='text'
             name='emailId'
             value={employee?.emailId}
-            onChange={handleChange}
+            onChange={(e) => handleChange(e)}
             className="h-18 w-96 border mt-2 px-2 py-2"></input>
         </div>
         <div className="items-center justify-center h-14 w-full my-4 pt-4 space-x-5">
@@ -83,7 +96,9 @@ const AddEmployee = () => {
           hover:bg-teal-800 ">
             Save
           </button>
-         <button className="rounded text-white bg-orange-500 px-2 py-2
+         <button
+         onClick={e => clear(e)}
+         className="rounded text-white bg-orange-500 px-2 py-2
           hover:bg-orange-800 ">
             Clear
           </button>
