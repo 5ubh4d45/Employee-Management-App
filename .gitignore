@@ -1,2 +1,4 @@
 excludig Idea .iml file
 *.iml
+
+*.env

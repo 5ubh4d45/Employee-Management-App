@@ -1,7 +1,8 @@
 import axios from "axios";
 import { EmployeeData } from "../data/EmployeeData";
 
-const EMPLOYEE_API_BASE_URL = "http://localhost:8080/api/v1/employees/";
+// const EMPLOYEE_API_BASE_URL: string = "http://localhost:8080/api/v1/employees/";
+const EMPLOYEE_API_BASE_URL= process.env.REACT_APP_EMPLOYEE_API_BASE_URL!;
 
 
 class EmployeeService{
@@ -63,6 +64,7 @@ class EmployeeService{
      */
     async getEmployees() : Promise<EmployeeData[] | null> {
         try {
+            console.log(EMPLOYEE_API_BASE_URL);
             const response = await axios.get<EmployeeData[]>(EMPLOYEE_API_BASE_URL);
             return Promise.resolve(response.data);
         } catch (error) {
