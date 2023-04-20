@@ -30,17 +30,22 @@ public class EmployeeServiceImpl implements EmployeeService{
     // Get
 
     @Override
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
+    public Optional<List<Employee>> getAllEmployees() {
+        return Optional.of(employeeRepository.findAll());
     }
 
     @Override
-    public List<Employee> getAllEmployees(int numberOfEmployees) {
-        if (numberOfEmployees == 0) {
-            return employeeRepository.findAll();
+    public Optional<List<Employee>> getEmployeesByPage(int pageIndex, int employeesPerPage) {
+        List<Employee> employeeList = new ArrayList<>();
+        if (employeesPerPage == 0) {
+            employeeList = employeeRepository.findAll();
+            return Optional.of(employeeList);
         }
-        PageRequest pageRequest = PageRequest.of(0, numberOfEmployees);
-        return employeeRepository.findAll(pageRequest).getContent();
+        if (pageIndex < 0 || employeesPerPage < 0) {
+            return Optional.empty();
+        }
+        PageRequest pageRequest = PageRequest.of(pageIndex, employeesPerPage);
+        return Optional.of(employeeRepository.findAll(pageRequest).getContent());
     }
 
     @Override

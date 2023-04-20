@@ -9,15 +9,20 @@ import java.util.Optional;
 public interface EmployeeService {
     /**
      * Get all employees
+     *
      * @return a list of all employees
      */
-    List<Employee> getAllEmployees();
+    Optional<List<Employee>> getAllEmployees();
     /**
-     * Get all employees
-     * @param numberOfEmployees number of employees to return
-     * @return a list of all employees
+     * Get all employees by page.
+     * Example: getEmployeesByPage(0, 10) will return the first 10 employees.
+     * @param pageIndex        zero based page index to get [MUST BE NON NEGATIVE]
+     * @param employeesPerPage number of employees per page[MUST BE GREATER THAN ZERO]
+     * @return a list of the employees on the given page.
+     *        If pageIndex is negative or employeesPerPage is zero, an empty optional is returned.
+     *        If pageIndex is zero and employeesPerPage is zero, all employees are returned.
      */
-    List<Employee> getAllEmployees(int numberOfEmployees);
+    Optional<List<Employee>> getEmployeesByPage(int pageIndex, int employeesPerPage);
     /**
      * Get employee by id
      * @param id id of the employee to search for

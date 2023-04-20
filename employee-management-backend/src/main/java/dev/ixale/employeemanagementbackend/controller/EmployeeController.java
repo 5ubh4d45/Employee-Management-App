@@ -22,8 +22,14 @@ public class EmployeeController {
     // GET
     @GetMapping("/")
     public ResponseEntity<Object> getAllEmployees() {
-
-        return ResponseEntity.ok(employeeService.getAllEmployees());
+        Optional<List<Employee>> employeeOptional = employeeService.getAllEmployees();
+        return processEmptyOptionalEmployeeList(employeeOptional, "No employees found");
+    }
+    @GetMapping("/page")
+    public ResponseEntity<Object> getEmployeesByPage(@RequestParam("pageIndex") int pageIndex,
+                                                     @RequestParam("employeesPerPage") int employeesPerPage) {
+        Optional<List<Employee>> employeeOptional = employeeService.getEmployeesByPage(pageIndex, employeesPerPage);
+        return processEmptyOptionalEmployeeList(employeeOptional, "No employees found");
     }
     @GetMapping("/{id}")
     public ResponseEntity<Object> getEmployee(@PathVariable("id") Long id) {
