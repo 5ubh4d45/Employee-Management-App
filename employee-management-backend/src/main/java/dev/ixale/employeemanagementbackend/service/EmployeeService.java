@@ -50,12 +50,13 @@ public interface EmployeeService {
     Optional<List<Employee>>  getEmployeeByEmailId(String emailId);
     /**
      * Search for employees by first name, last name and email id
+     *
      * @param firstName first name of the employee to search for (optional)
-     * @param lastName last name of the employee to search for (optional)
-     * @param emailId email id of the employee to search for (optional)
+     * @param lastName  last name of the employee to search for (optional)
+     * @param emailId   email id of the employee to search for (optional)
      * @return a list of employees matching the search criteria
      */
-    List<Employee> searchEmployees(String firstName, String lastName, String emailId);
+    Optional<List<Employee>> searchEmployees(String firstName, String lastName, String emailId);
 
     /**
      * Save a new employee

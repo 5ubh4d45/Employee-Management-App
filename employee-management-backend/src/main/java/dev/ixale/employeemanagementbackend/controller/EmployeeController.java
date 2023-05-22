@@ -63,11 +63,11 @@ public class EmployeeController {
             @RequestParam(value = "lastName", required = false) String lastName,
             @RequestParam(value = "emailId", required = false) String emailID ) {
 
-        List<Employee> searchedEmployees = employeeService.searchEmployees(firstName, lastName, emailID);
+        Optional<List<Employee>> searchedEmployees = employeeService.searchEmployees(firstName, lastName, emailID);
 
         if (searchedEmployees.isEmpty()) return ResponseEntity.noContent().build();
 
-        return ResponseEntity.ok(searchedEmployees);
+        return ResponseEntity.ok(searchedEmployees.get());
     }
 
     // POST

@@ -71,7 +71,7 @@ public class EmployeeServiceImpl implements EmployeeService{
     // Search
 
     @Override
-    public List<Employee> searchEmployees(String firstName, String lastName, String emailId) {
+    public Optional<List<Employee>> searchEmployees(String firstName, String lastName, String emailId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Employee> criteriaQuery = criteriaBuilder.createQuery(Employee.class);
         Root<Employee> employeeRoot = criteriaQuery.from(Employee.class);
@@ -92,7 +92,7 @@ public class EmployeeServiceImpl implements EmployeeService{
 
         TypedQuery<Employee> typedQuery = entityManager.createQuery(criteriaQuery);
 
-        return typedQuery.getResultList();
+        return Optional.of(typedQuery.getResultList());
     }
 
 
@@ -101,9 +101,10 @@ public class EmployeeServiceImpl implements EmployeeService{
     @Override
     public Optional<Employee> saveNewEmployee(Employee employee) {
         // create a search query to check if the employee already exists
-        List<Employee> employees = searchEmployees(employee.getFirstName(), employee.getLastName(), employee.getEmailId());
-        if (employees.size() > 0)
-            return Optional.empty();
+        Optional<List<Employee>> employees = searchEmployees(employee.getFirstName(), employee.getLastName(), employee.getEmailId());
+
+        if (employees.isEmpty()) return Optional.empty();
+        if (employees.get().size() > 0) return Optional.empty();
 
         return Optional.of(employeeRepository.save(employee));
     }
