@@ -67,9 +67,10 @@ const UpdateEmployee = () => {
         .catch((error) => {
             console.log(error);
             alert("Cannot Update Employee. " + error);
+        })
+        .finally(() => {
+          navigaveTo('/employeeList');
         });
-
-        navigaveTo('/employeeList');
     };
 
 

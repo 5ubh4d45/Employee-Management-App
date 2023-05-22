@@ -39,9 +39,11 @@ const AddEmployee = () => {
     .catch((error) => {
       console.log(error);
       alert("Cannot save employee. " + error);
+    })
+    .finally(() => {
+      navigaveTo('/employeeList');
     });
 
-    navigaveTo('/employeeList');
   };
 
   function clear(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
